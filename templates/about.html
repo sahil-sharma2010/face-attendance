@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Project - Premium</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background-color: #11141c; 
+            color: #ffffff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px;
+        }
+        .about-container {
+            background-color: #1e2532;
+            padding: 40px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 650px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 1px solid #2d3342;
+        }
+        h1 { color: #0097ff; margin-bottom: 20px; font-size: 26px; }
+        p { color: #cbd5e1; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+        
+        .tech-stack {
+            background-color: #242a38;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #2ed573;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .details-section {
+            text-align: left;
+            background-color: #181d27;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #2d3342;
+        }
+
+        .details-section h3 {
+            color: #c56cf0;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .details-section ul {
+            list-style-type: none;
+        }
+
+        .details-section li {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .details-section li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #0097ff;
+            font-weight: bold;
+        }
+
+        .details-section strong {
+            color: #ffffff;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #0097ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-back:hover { background-color: #007bb5; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="about-container">
+        <h1>Face Recognition Attendance</h1>
+        <p>This automated attendance system harnesses the power of advanced computer vision to securely recognize faces and log attendance in real-time. It is designed to be fast, highly accurate, and completely removes the need for manual data entry.</p>
+        
+        <div class="tech-stack">
+            Powered by: Python | Flask | OpenCV | SQLite
+        </div>
+
+        <div class="details-section">
+            <h3>✨ Key Project Features</h3>
+            <ul>
+                <li><strong>Face Registration:</strong> Automatically captures and processes multiple sample images to create a highly accurate facial profile for every new student.</li>
+                <li><strong>Real-Time Recognition:</strong> Utilizes OpenCV algorithms to instantly detect and verify faces via the webcam with high precision.</li>
+                <li><strong>Automated Logging:</strong> Records the student's identity along with the exact date and timestamp directly into a secure SQLite database.</li>
+                <li><strong>Data Export:</strong> Allows administrators to generate and download attendance reports in CSV format with a single click for easy record-keeping.</li>
+                <li><strong>Secure Access:</strong> The entire dashboard and its functions are protected behind an admin authentication system to prevent unauthorized changes.</li>
+            </ul>
+        </div>
+
+        <a href="/dashboard" class="btn-back">Return to Dashboard</a>
+    </div>
+</body>
+</html>

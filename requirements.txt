@@ -1,0 +1,4 @@
+Flask
+werkzeug
+opencv-python-headless
+gunicorn

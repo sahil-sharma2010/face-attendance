@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Teacher Registration | 3D Video Theme</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        
+        body {
+            background-color: #050914; 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 30px; overflow-x: hidden;
+            perspective: 1200px; 
+        }
+
+        /* ----- 3D VIDEO BACKGROUND ----- */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        /* Dark Overlay for clear text reading */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 10, 20, 0.4); 
+            z-index: -1;
+        }
+
+        /* ----- 3D NEON CARD ----- */
+        .neon-card {
+            background: rgba(0, 15, 30, 0.85); /* Dark background text clarity ke liye */
+            padding: 35px 40px; border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 243, 255, 0.2);
+            border: 2px solid #00f3ff; width: 100%; max-width: 600px; 
+            backdrop-filter: blur(15px); transform-style: preserve-3d; transition: transform 0.1s ease-out;
+            z-index: 10;
+        }
+
+        h2 { text-align: center; color: #fff; text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff; margin-bottom: 25px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transform: translateZ(40px); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 15px; transform: translateZ(20px); }
+        .full-width { grid-column: 1 / -1; }
+
+        label { font-size: 13px; color: #00f3ff; font-weight: bold; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        
+        input, select {
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 5px;
+            border: 1px solid rgba(0, 243, 255, 0.3); background: rgba(0, 243, 255, 0.08);
+            color: #ffffff; outline: none; transition: 0.3s; appearance: none; font-size: 14px; font-weight: bold;
+        }
+        
+        /* 🔥 FIX: Branch Option Black Text */
+        select option {
+            color: black;
+            background: white;
+        }
+
+        input:focus, select:focus { border-color: #00f3ff; background-color: rgba(0, 243, 255, 0.15); box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+        input::placeholder { color: rgba(255, 255, 255, 0.6); font-weight: normal;}
+
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.7) sepia(1) hue-rotate(180deg) saturate(3); cursor: pointer; }
+
+        /* ----- PASSWORD TOGGLE FIX ----- */
+        .password-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 15px; }
+        .password-wrapper input { margin-bottom: 0; padding-right: 40px; }
+        .toggle-icon { position: absolute; right: 15px; cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
+        .toggle-icon svg { stroke: #00f3ff; }
+        .toggle-icon:hover { opacity: 0.7; filter: drop-shadow(0 0 5px #00f3ff); }
+
+        /* ----- OTP SECTION ----- */
+        .otp-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .otp-group input { margin-bottom: 0; }
+        .otp-btn {
+            background: rgba(255, 174, 0, 0.1); color: #ffae00; border: 2px solid #ffae00; padding: 12px 15px;
+            border-radius: 5px; font-weight: bold; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 0 10px #ffae00 inset; transition: 0.3s; width: auto; white-space: nowrap;
+        }
+        .otp-btn:hover { background: #ffae00; color: #000; box-shadow: 0 0 20px #ffae00, 0 0 40px #ffae00 inset; }
+        .otp-btn:disabled { border-color: #6b7280; color: #6b7280; box-shadow: none; cursor: not-allowed; background: transparent; }
+        
+        /* ----- NEON BUTTONS ----- */
+        .btn-neon {
+            width: 100%; padding: 14px; background: rgba(0, 243, 255, 0.1); color: #00f3ff;
+            border: 2px solid #00f3ff; border-radius: 5px; font-weight: bold; font-size: 16px;
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.4s;
+            box-shadow: 0 0 10px #00f3ff inset, 0 5px 15px rgba(0,0,0,0.5); transform: translateZ(30px); margin-top: 10px;
+        }
+        .btn-active { cursor: pointer; opacity: 1 !important; }
+        .btn-active:hover { background: #00f3ff; color: #000; box-shadow: 0 0 30px #00f3ff, 0 0 60px #00f3ff inset; }
+
+        /* BACK BUTTON */
+        .btn-danger {
+            background: rgba(255, 0, 60, 0.1); color: #ff003c; border-color: #ff003c; box-shadow: 0 0 10px #ff003c inset, 0 5px 15px rgba(0,0,0,0.5);
+            text-decoration: none; display: block; text-align: center; margin-top: 15px;
+        }
+        .btn-danger:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="{{ url_for('static', filename='register_bg.mp4') }}" type="video/mp4">
+    </video>
+
+    <div class="video-overlay"></div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    icon: 'error', title: 'SYSTEM ERROR', text: '{{ messages[0] }}',
+                    background: 'rgba(0, 24, 40, 0.95)', color: '#00f3ff', confirmButtonColor: '#ff003c'
+                });
+            });
+        </script>
+      {% endif %}
+    {% endwith %}
+
+    <div class="neon-card" id="tilt-card">
+        <h2>TEACHER REGISTRATION</h2>
+
+        <form method="POST" action="/teacher/register">
+            <div class="form-grid">
+                <div>
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Ex: XYZ" required>
+                </div>
+                <div>
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="For Login" required>
+                </div>
+                
+                <div>
+                    <label>Branch</label>
+                    <select name="branch" required>
+                        <option value="" disabled selected style="color: gray;">Select Branch</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Electronics Engineering">Electronics Engineering</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Mobile Number</label>
+                    <input type="text" name="mobile" placeholder="10-digit number" required>
+                </div>
+                
+                <div>
+                    <label>Subject</label>
+                    <input type="text" name="subject" placeholder="Assigned Subject" required>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label>Start Time</label>
+                        <input type="time" name="class_time" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>End Time</label>
+                        <input type="time" name="end_time" required>
+                    </div>
+                </div>
+
+                <div class="full-width">
+                    <label>Email ID (For Verification)</label>
+                    <input type="email" name="email" id="emailInput" placeholder="example@college.com" required>
+                </div>
+                
+                <div class="full-width">
+                    <label>Email OTP Verification</label>
+                    <div class="otp-group">
+                        <input type="text" name="otp" id="otpInput" placeholder="Enter 6-digit OTP" required>
+                        <button type="button" class="otp-btn" id="otpBtn" onclick="requestOTP()">Get OTP</button>
+                        <button type="button" class="otp-btn" id="verifyBtn" onclick="verifyOTP()" style="display:none; background:rgba(0,243,255,0.1); color:#00f3ff; border-color:#00f3ff; box-shadow:0 0 10px #00f3ff inset;">Verify OTP</button>
+                    </div>
+                </div>
+                
+                <div class="full-width">
+                    <label>Create Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="regPass" placeholder="Make it secure" required>
+                        <span class="toggle-icon" onclick="togglePass('regPass', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="full-width">
+                    <label>Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="confirm_password" id="regConfirmPass" placeholder="Re-enter your password" required>
+                        <span class="toggle-icon" onclick="togglePass('regConfirmPass', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="btn-neon" disabled style="opacity: 0.4; cursor: not-allowed;">REGISTER ACCOUNT</button>
+            
+            <a href="/" class="btn-neon btn-danger">🔙 BACK TO LOGIN</a>
+        </form>
+    </div>
+
+    <script>
+        emailjs.init("K6cs_matxXu2begVg");
+
+        // 3D Tilt Effect - disabled on touch screens for better mobile UX
+        const card = document.getElementById('tilt-card');
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                let xAxis = (window.innerWidth / 2 - e.pageX) / 40;
+                let yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            document.addEventListener('mouseleave', () => { card.style.transform = `rotateY(0deg) rotateX(0deg)`; card.style.transition = `transform 0.5s ease`; });
+            document.addEventListener('mouseenter', () => { card.style.transition = `none`; });
+        }
+
+        // Password Show/Hide Function
+        function togglePass(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+            } else {
+                input.type = "password";
+                iconElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            }
+        }
+
+        // OTP Request Function
+        function requestOTP() {
+            const email = document.getElementById('emailInput').value;
+            const btn = document.getElementById('otpBtn');
+
+            if (!email) {
+                Swal.fire({ icon: 'warning', title: 'Email Required', text: 'Please enter your Email ID first!', background: 'rgba(0, 24, 40, 0.95)', color: '#00f3ff' });
+                return;
+            }
+
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
+
+            fetch('/send-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'email=' + encodeURIComponent(email)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const templateParams = { to_email: email, otp: data.otp };
+
+                    emailjs.send("service_zvy3re2", "template_voil6wc", templateParams)
+                        .then(function() {
+                            Swal.fire({ icon: 'success', title: 'OTP SENT!', text: 'Check your Email for the 6-digit code.', background: 'rgba(0, 24, 40, 0.95)', color: '#00ff00' });
+                            
+                            btn.style.display = "none";
+                            document.getElementById('verifyBtn').style.display = "block";
+                            
+                        }, function() {
+                            Swal.fire({ icon: 'error', title: 'FAILED', text: 'EmailJS Error. Check API settings.', background: 'rgba(0, 24, 40, 0.95)', color: '#ff003c' });
+                            btn.innerText = "GET OTP"; btn.disabled = false;
+                        });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'ERROR', text: 'Backend failed to generate OTP.', background: 'rgba(0, 24, 40, 0.95)', color: '#ff003c' });
+                    btn.innerText = "GET OTP"; btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                btn.innerText = "GET OTP"; btn.disabled = false;
+            });
+        }
+
+        // OTP Verify Function
+        function verifyOTP() {
+            const email = document.getElementById('emailInput').value;
+            const otp = document.getElementById('otpInput').value;
+            const vBtn = document.getElementById('verifyBtn');
+
+            if (!otp) {
+                Swal.fire({ icon: 'warning', text: 'Please enter the OTP!', background: 'rgba(0, 24, 40, 0.95)', color: '#00f3ff' });
+                return;
+            }
+
+            vBtn.innerText = "CHECKING...";
+            vBtn.disabled = true;
+
+            fetch('/verify-register-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'email=' + encodeURIComponent(email) + '&otp=' + encodeURIComponent(otp)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'VERIFIED!', text: 'OTP Matched. You can now register.', background: 'rgba(0, 24, 40, 0.95)', color: '#00ff00', confirmButtonColor: '#00ff00' });
+                    
+                    vBtn.innerText = "VERIFIED ✅";
+                    vBtn.style.background = "rgba(0, 255, 0, 0.1)";
+                    vBtn.style.color = "#00ff00";
+                    vBtn.style.borderColor = "#00ff00";
+                    vBtn.style.boxShadow = "0 0 20px #00ff00 inset";
+                
+                    const subBtn = document.getElementById('submitBtn');
+                    subBtn.disabled = false;
+                    subBtn.style.opacity = "1";
+                    subBtn.innerText = "REGISTER ACCOUNT"; 
+                    subBtn.classList.add("btn-active");
+                } else {
+                    Swal.fire({ icon: 'error', title: 'WRONG OTP', text: data.message, background: 'rgba(0, 24, 40, 0.95)', color: '#ff003c', confirmButtonColor: '#ff003c' });
+                    vBtn.innerText = "VERIFY OTP";
+                    vBtn.disabled = false;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

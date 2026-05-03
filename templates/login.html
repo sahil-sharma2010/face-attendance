@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Portal Login - Clear 3D Video</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body {
+            background-color: #050914; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            perspective: 1000px; 
+            padding: 20px; /* Mobile par screen se chipakne se rokne ke liye */
+        }
+        
+        /* ----- 3D VIDEO BACKGROUND ----- */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* Video ko screen par properly fit karega */
+            z-index: -2;
+        }
+
+        /* Dark Overlay - Blur hata diya taaki video ekdum clear dikhe */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 10, 20, 0.4); /* Halka dark tint */
+            z-index: -1;
+        }
+
+        /* 3D Neon Card Container - RESPONSIVE & DARKER FOR TEXT CLARITY */
+        .login-container {
+            background: rgba(0, 15, 30, 0.85); /* Dark background text clarity ke liye */
+            border: 2px solid #00f3ff;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 243, 255, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;          /* Mobile ke liye full width */
+            max-width: 380px;     /* Laptop ke liye limit */
+            text-align: center;
+            backdrop-filter: blur(15px);
+            transform-style: preserve-3d; 
+            transition: transform 0.1s ease-out;
+            z-index: 10;
+        }
+
+        .login-container h2 {
+            color: #fff;
+            text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transform: translateZ(50px); 
+        }
+
+        .input-group {
+            background-color: rgba(0, 243, 255, 0.08);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            transform: translateZ(30px);
+            transition: 0.3s;
+        }
+
+        .input-group:focus-within {
+            border: 1px solid #00f3ff;
+            background-color: rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+
+        .input-group span {
+            margin-right: 15px;
+            font-size: 18px;
+            text-shadow: 0 0 5px #00f3ff;
+        }
+
+        .input-group input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff; /* White text for clear reading */
+            font-weight: bold;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: normal;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            color: #ffffff;
+            font-size: 13px;
+            margin-bottom: 25px;
+            transform: translateZ(20px);
+            flex-wrap: wrap; /* Phone screens par wrap hone ke liye */
+            gap: 10px;
+        }
+
+        .options .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .options input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #00f3ff;
+        }
+
+        .register-link {
+            color: #00f3ff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            text-shadow: 0 0 5px #00f3ff;
+        }
+
+        .register-link:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px #00f3ff;
+        }
+
+        .login-btn {
+            background: rgba(0, 243, 255, 0.1);
+            color: #00f3ff;
+            border: 2px solid #00f3ff;
+            width: 100%;
+            padding: 14px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px #00f3ff inset, 0 5px 15px rgba(0,0,0,0.5);
+            transition: 0.4s;
+            transform: translateZ(40px);
+        }
+
+        .login-btn:hover {
+            background: #00f3ff;
+            color: #000;
+            box-shadow: 0 0 30px #00f3ff, 0 0 60px #00f3ff inset;
+        }
+
+        .error-msg {
+            color: #ff003c;
+            text-shadow: 0 0 5px #ff003c;
+            margin-top: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            transform: translateZ(30px);
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #00f3ff;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 1px;
+            line-height: 1.6;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px #00f3ff;
+            z-index: 10;
+        }
+        
+        .footer strong {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="{{ url_for('static', filename='login_bg.mp4') }}" type="video/mp4">
+    </video>
+
+    <div class="video-overlay"></div>
+
+    <div class="login-container" id="tilt-card">
+        <h2>PORTAL LOGIN</h2>
+        
+        <form method="POST" action="/" autocomplete="off">
+            
+            <input style="display:none" type="text" name="fakeusernameremembered">
+            <input style="display:none" type="password" name="fakepasswordremembered">
+
+            <div class="input-group">
+                <span>👤</span>
+                <input type="text" name="username" placeholder="Enter Username" required autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+            
+            <div class="input-group">
+                <span>🔒</span>
+                <input type="password" name="password" id="passInput" placeholder="Enter Password" required autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+            
+            <div class="options">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showPass" onclick="togglePassword()">
+                    <label for="showPass">Show Password</label>
+                </div>
+                <a href="/teacher/register" class="register-link">📝 Register Teacher</a>
+            </div>
+            
+            <button type="submit" class="login-btn">LOGIN</button>
+        </form>
+
+        {% if error %}
+            <div class="error-msg">⚠️ {{ error }}</div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        Developed by<br>
+        <strong> SAHIL SHARMA </strong>
+    </div>
+
+    <script>
+        function togglePassword() {
+            var x = document.getElementById("passInput");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+
+        // 3D Tilt Effect - Disabled on mobile devices for better user experience
+        const card = document.getElementById('tilt-card');
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            
+            document.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+                card.style.transition = `transform 0.5s ease`;
+            });
+            document.addEventListener('mouseenter', () => {
+                card.style.transition = `none`;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Login Portal</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+            width: 350px;
+        }
+        h2 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        .messages {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #f87171;
+            font-size: 14px;
+            text-align: center;
+        }
+        .messages p { margin: 5px 0; font-weight: bold; }
+        
+        label {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 10px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0369a1;
+        }
+        .otp-section {
+            margin-top: 20px;
+            border-top: 1px solid #334155;
+            padding-top: 15px;
+        }
+        .link-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .link-text a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* 🔥 CSS FOR RED NEON POPUP */
+        .neon-red-popup {
+            background: #050914 !important;
+            border: 2px solid #ff003c !important;
+            box-shadow: 0 0 25px #ff003c, inset 0 0 15px #ff003c !important;
+            color: #fff !important;
+            border-radius: 15px !important;
+        }
+        .neon-red-title {
+            color: #ff003c !important;
+            text-shadow: 0 0 10px #ff003c !important;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace !important;
+        }
+        .neon-red-content {
+            color: #ffb3c1 !important;
+            font-weight: bold;
+            font-family: 'Courier New', monospace !important;
+        }
+    </style>
+</head>
+<body>
+
+{% if session.pop('registered_alert', None) %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'YOUR REGISTER REQUEST SEND SUCCESSFULLY',
+            text: 'WAIT TO APPROVE AND CHECK YOUR EMAIL EVERY DAY THANKS',
+            icon: 'success',
+            iconColor: '#ff003c',
+            timer: 4000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'neon-red-popup',
+                title: 'neon-red-title',
+                htmlContainer: 'neon-red-content'
+            }
+        });
+    });
+</script>
+{% endif %}
+
+<div class="login-box">
+    <h2>👨‍🏫 Teacher Portal</h2>
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="messages">
+        {% for message in messages %}
+          <p>⚠️ {{ message }}</p>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/teacher/login">
+        <label>Teacher ID / Email:</label>
+        <input type="text" name="email" placeholder="Enter ID or Email" required>
+        
+        <label>Password:</label>
+        <input type="password" name="password" placeholder="Enter your password" required>
+        
+        <button type="submit">Open Portal</button>
+    </form>
+
+    <div class="otp-section">
+        <h3 style="text-align:center; color:#38bdf8;">Login via OTP</h3>
+
+        <input type="email" id="otp_email" placeholder="Enter Email">
+        <button type="button" onclick="sendOTP()">Send OTP</button>
+
+        <input type="text" id="otp_input" placeholder="Enter OTP">
+        <button type="button" onclick="verifyOTP()">Verify OTP</button>
+    </div>
+    
+    <div class="link-text">
+        Don't have an account?<br>
+        <a href="/teacher/register">✨ New Teacher Registration</a>
+    </div>
+</div>
+
+<script>
+    emailjs.init("K6cs_matxXu2begVg");
+
+    let generatedOTP = "";
+
+    function sendOTP() {
+        let email = document.getElementById("otp_email").value;
+
+        if(email === ""){
+            alert("Enter Email First");
+            return;
+        }
+
+        generatedOTP = Math.floor(100000 + Math.random() * 900000);
+
+        emailjs.send("service_zvy3re2", "template_voil6wc", {
+            to_email: email,
+            otp: generatedOTP
+        })
+        .then(function() {
+            alert("OTP Sent ✅");
+        }, function(error) {
+            alert("Error sending OTP ❌");
+        });
+    }
+
+    function verifyOTP() {
+        let userOTP = document.getElementById("otp_input").value;
+
+        if(userOTP == generatedOTP && userOTP !== ""){
+            alert("Login Success ✅");
+            // Dashboard par redirect karega
+            window.location.href = "/teacher/dashboard";
+        } else {
+            alert("Wrong OTP ❌");
+        }
+    }
+</script>
+
+</body>
+</html>

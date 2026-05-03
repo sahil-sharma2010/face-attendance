@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Attendance</title>
+    <style>
+        /* Theme Variables & Base Medium Font Size */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background-color: var(--bg-color, #0f172a); 
+            color: var(--text-color, white); 
+            display: flex; 
+            height: 100vh; 
+            font-size: 15px; 
+        }
+        
+        /* Sidebar (Medium Sized Text) */
+        .sidebar { width: 250px; background-color: var(--card-bg, #1e293b); display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--border-color, #334155); }
+        .brand { font-size: 18px; font-weight: bold; color: #38bdf8; text-align: center; margin: 20px 0 30px; }
+        .nav-item { padding: 12px 20px; color: var(--text-color, white); text-decoration: none; display: block; font-weight: bold; font-size: 15px; transition: 0.2s; }
+        .nav-item:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        .nav-item.active { background-color: #38bdf8; color: #0f172a; border-radius: 0 25px 25px 0; margin-right: 20px; }
+        .logout-btn { background-color: #ef4444; color: white; text-align: center; padding: 14px; text-decoration: none; font-weight: bold; font-size: 15px; box-shadow: 0 -4px 0 #b91c1c inset; }
+
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        /* Header & Back Button (Scaled to Medium Size) */
+        .header-title { font-size: 22px; color: #38bdf8; margin-bottom: 25px; border-bottom: 2px solid var(--border-color, #334155); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .btn-back { padding: 8px 16px; background: #64748b; color: white; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 0 #475569; transition: 0.1s;}
+        .btn-back:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; }
+
+        /* Table Design (Medium Sized Padding and Fonts) */
+        .table-container { background: var(--card-bg, #1e293b); border-radius: 10px; border: 1px solid var(--border-color, #334155); overflow: hidden; box-shadow: 0 8px 12px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #38bdf8; color: #0f172a; padding: 12px; font-size: 15px; }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color, #334155); font-size: 14px; }
+        tr:hover { background-color: rgba(56, 189, 248, 0.05); }
+        
+        /* Status Colors */
+        .status-present { color: #10b981; font-weight: bold; }
+        .status-absent { color: #ef4444; font-weight: bold; }
+        
+        /* Light Mode Overrides */
+        body.light-mode { --bg-color: #f1f5f9; --text-color: #0f172a; --card-bg: #ffffff; --border-color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <script>if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');</script>
+
+    <div class="sidebar">
+        <div>
+            <div class="brand">👩‍🏫 Teacher Portal</div>
+            <a href="/teacher/dashboard" class="nav-item">Dashboard</a>
+            <a href="/teacher/profile" class="nav-item">Personal Info</a>
+            <a href="/teacher/settings" class="nav-item">Settings</a>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-title">
+            <span>📋 Today's Class Attendance</span>
+            <a href="/teacher/dashboard" class="btn-back">⬅ Back to Dashboard</a>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+                {% for student in student_data %}
+                <tr>
+                    <td style="font-weight:bold;">{{ student.name }}</td>
+                    <td>{{ student.roll }}</td>
+                    <td>{{ student.date }}</td>
+                    <td class="{% if '✅' in student.status %}status-present{% else %}status-absent{% endif %}">
+                        {{ student.status }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

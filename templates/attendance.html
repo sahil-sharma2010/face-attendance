@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance History | 3D Neon</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        body { background-color: #050914; min-height: 100vh; padding: 30px; }
+
+        /* ----- 3D NEON GRID BACKGROUND ----- */
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px; transform: rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: moveGrid 15s linear infinite; z-index: -1;
+        }
+        @keyframes moveGrid { 0% { transform: rotateX(60deg) translateY(0) translateZ(-200px); } 100% { transform: rotateX(60deg) translateY(40px) translateZ(-200px); } }
+
+        .container { max-width: 1000px; margin: auto; position: relative; z-index: 10; }
+
+        /* ----- HEADER & NEON BUTTON ----- */
+        .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 15px; }
+        .header-nav h1 { color: #fff; text-shadow: 0 0 10px #00f3ff; text-transform: uppercase; letter-spacing: 2px; font-size: 24px; }
+
+        .btn-neon { background: transparent; color: #00f3ff; border: 2px solid #00f3ff; padding: 10px 20px; border-radius: 5px; font-weight: bold; text-transform: uppercase; text-decoration: none; box-shadow: 0 0 10px #00f3ff inset; transition: 0.3s; display: inline-block; cursor: pointer; font-size: 14px;}
+        .btn-neon:hover { background: #00f3ff; color: #000; box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff inset; }
+
+        /* ----- 2D LIFT ANIMATION WITH NEON BORDERS ----- */
+        .history-card {
+            background: rgba(0, 24, 40, 0.8);
+            border: 2px solid #00f3ff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .history-card:hover { transform: translateY(-8px); box-shadow: 0 0 25px rgba(0, 243, 255, 0.5); }
+
+        /* ----- TABLE STYLING ----- */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #00f3ff; color: #00f3ff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 5px #00f3ff; background: rgba(0, 243, 255, 0.1); }
+
+        /* PLAIN WHITE TEXT FOR DATA READABILITY */
+        td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 15px; color: #ffffff; font-family: Arial, Helvetica, sans-serif; text-shadow: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.05); }
+
+        .status-present { color: #00ff00; font-weight: bold; display: flex; align-items: center; gap: 5px; font-family: 'Courier New', Courier, monospace;}
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <div class="header-nav">
+            <h1>📂 Global Attendance History</h1>
+            <button onclick="history.back()" class="btn-neon">🔙 Go Back</button>
+        </div>
+
+        <div class="history-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ row.name }}</td>
+                        <td>{{ row.roll }}</td>
+                        <td style="color: #a0d8ef; font-weight: bold;">{{ row.subject }}</td>
+                        <td>{{ row.date }}</td>
+                        <td>{{ row.time }}</td>
+                        <td><span class="status-present">✅ Present</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">No attendance records found. Database is currently empty.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

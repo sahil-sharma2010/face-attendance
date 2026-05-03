@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white; padding: 15px 30px; border-radius: 8px; }
+        .btn-logout { background: #e74c3c; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
+        th { background-color: #34495e; color: white; }
+        .status-active { color: green; font-weight: bold; }
+        .status-inactive { color: orange; font-weight: bold; }
+        .status-suspended { color: red; font-weight: bold; }
+        .btn-update { background: #3498db; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        .action-form { display: inline-block; margin: 0; }
+        .messages { color: green; font-weight: bold; margin-top: 15px; }
+        .section-title { margin-top: 30px; color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 5px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>Admin Dashboard Panel 🛡️</h2>
+    <a href="/logout" class="btn-logout">Logout</a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="messages">
+    {% for message in messages %}
+      <p>✔️ {{ message }}</p>
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<h3 class="section-title">Registered Teachers</h3>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Subject</th>
+        <th>Class Time</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for teacher in teachers %}
+    <tr>
+        <td>{{ teacher['id'] }}</td>
+        <td>{{ teacher['name'] }}</td>
+        <td>{{ teacher['email'] }}</td>
+        <td>{{ teacher['subject'] }}</td>
+        <td>{{ teacher['class_time'] }}</td>
+        <td class="
+            {% if teacher['status'] == 'Active' %}status-active
+            {% elif teacher['status'] == 'Inactive' %}status-inactive
+            {% else %}status-suspended{% endif %}">
+            {{ teacher['status'] }}
+        </td>
+        <td>
+            <form class="action-form" action="/admin/update_status/{{ teacher['id'] }}" method="POST">
+                <select name="status">
+                    <option value="Active" {% if teacher['status'] == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if teacher['status'] == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="Suspended" {% if teacher['status'] == 'Suspended' %}selected{% endif %}>Suspended</option>
+                </select>
+                <button type="submit" class="btn-update">Update</button>
+            </form>
+            
+            <form class="action-form" action="/admin/delete_teacher/{{ teacher['id'] }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this teacher?');">
+                <button type="submit" class="btn-delete" style="margin-left: 10px;">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center;">No teachers registered yet.</td></tr>
+    {% endfor %}
+</table>
+
+<h3 class="section-title">Teacher Activity Logs (GPS & Time)</h3>
+<table>
+    <tr>
+        <th>Log ID</th>
+        <th>Teacher Name</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>GPS Location</th>
+    </tr>
+    {% for log in logs %}
+    <tr>
+        <td>{{ log['id'] }}</td>
+        <td><strong>{{ log['teacher_name'] }}</strong></td>
+        <td>{{ log['date'] }}</td>
+        <td>{{ log['time'] }}</td>
+        <td style="color: green; font-weight: bold;">{{ log['status'] }}</td>
+        <td style="font-size: 0.9em; color: #555;">{{ log['location'] }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;">No activity logs found.</td></tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

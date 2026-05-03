@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard | 3D Neon</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+
+        body { 
+            display: flex; 
+            background-color: #050914; 
+            color: #e0f7fa; 
+            height: 100vh; 
+            overflow: hidden; 
+            perspective: 1200px; 
+        }
+
+        /* ----- 3D NEON GRID BACKGROUND ----- */
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px; 
+            transform: rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: moveGrid 15s linear infinite; 
+            z-index: 0;
+        }
+        @keyframes moveGrid { 
+            0% { transform: rotateX(60deg) translateY(0) translateZ(-200px); } 
+            100% { transform: rotateX(60deg) translateY(40px) translateZ(-200px); } 
+        }
+
+        /* ----- SIDEBAR (Glassmorphism Neon) ----- */
+        .sidebar { 
+            width: 260px; 
+            background: rgba(0, 15, 25, 0.8); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+            border-right: 2px solid #00f3ff; 
+            box-shadow: 5px 0 20px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        .sidebar-top { padding-top: 20px; }
+        .brand { 
+            font-size: 18px; font-weight: bold; color: #00f3ff; text-align: center; 
+            margin-bottom: 30px; text-shadow: 0 0 10px #00f3ff; text-transform: uppercase; letter-spacing: 2px;
+        }
+        
+        .nav-item { 
+            padding: 15px 20px; color: #a0d8ef; text-decoration: none; display: block; 
+            font-size: 15px; font-weight: bold; text-transform: uppercase; transition: 0.3s;
+            border: 1px solid transparent; margin: 5px 15px; border-radius: 8px;
+        }
+        .nav-item:hover { 
+            color: #fff; background: rgba(0, 243, 255, 0.1); 
+            border-color: #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4) inset;
+            transform: translateX(5px); 
+        }
+        .nav-item.active { 
+            background: rgba(0, 243, 255, 0.2); color: #00f3ff; 
+            border: 1px solid #00f3ff; box-shadow: 0 0 15px #00f3ff inset;
+        }
+        
+        .logout-btn { 
+            background: transparent; color: #ff003c; text-align: center; padding: 15px; 
+            text-decoration: none; font-weight: bold; display: block; border: 1px solid #ff003c;
+            margin: 15px; border-radius: 8px; text-transform: uppercase; box-shadow: 0 0 10px #ff003c inset; transition: 0.3s;
+        }
+        .logout-btn:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+        /* ----- MAIN CONTENT ----- */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; z-index: 10; }
+        
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+        .welcome-text h1 { margin: 0; color: #fff; font-size: 28px; text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff; text-transform: uppercase; letter-spacing: 2px; }
+        .welcome-text p { margin: 8px 0 0 0; color: #bdf8ff; font-size: 15px; }
+
+        .uid-badge {
+            background: rgba(0, 243, 255, 0.1); color: #00f3ff; padding: 10px 20px; 
+            border-radius: 8px; font-weight: bold; border: 1px solid #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.5) inset;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* ----- 3D CARDS ----- */
+        .cards-container { display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; }
+        
+        .card, .action-box, .history-section { 
+            background: rgba(0, 24, 40, 0.6); 
+            border: 1px solid #00f3ff; 
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            border-radius: 15px; padding: 25px; 
+            backdrop-filter: blur(8px); 
+            transform-style: preserve-3d; transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card { flex: 1; text-align: center; min-width: 250px; }
+        .card h3 { margin: 0; font-size: 14px; color: #00f3ff; text-transform: uppercase; letter-spacing: 1px; }
+        .card-value { font-size: 28px; font-weight: bold; margin-top: 10px; color: #fff; text-shadow: 0 0 10px #00f3ff; }
+        
+        .clickable-card { cursor: pointer; border-color: #00f3ff; transition: 0.3s; }
+        .clickable-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 0 25px rgba(0, 243, 255, 0.5); border: 1px solid #fff; }
+
+        /* ----- ACTION BOX & BUTTONS ----- */
+        .action-box { text-align: center; margin-bottom: 40px; }
+        .action-box h2 { color: #fff; text-shadow: 0 0 10px #00f3ff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;}
+        .action-box p { color: #bdf8ff; margin-bottom: 25px; }
+
+        .btn-neon {
+            background: transparent; color: #00f3ff; border: 2px solid #00f3ff; padding: 15px 40px;
+            border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 0 10px #00f3ff inset, 0 0 10px #00f3ff; transition: 0.4s; display: inline-block; text-decoration: none;
+        }
+        .btn-neon:hover { background: #00f3ff; color: #000; box-shadow: 0 0 30px #00f3ff, 0 0 60px #00f3ff inset; transform: translateY(-3px); }
+
+        .btn-warning { color: #ffae00; border-color: #ffae00; box-shadow: 0 0 10px #ffae00 inset, 0 0 10px #ffae00; }
+        .btn-warning:hover { background: #ffae00; color: #000; box-shadow: 0 0 20px #ffae00, 0 0 40px #ffae00 inset; }
+        
+        .btn-danger { color: #ff003c; border-color: #ff003c; box-shadow: 0 0 10px #ff003c inset, 0 0 10px #ff003c; }
+        .btn-danger:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+        /* ----- ALERTS ----- */
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; backdrop-filter: blur(5px); }
+        .alert-warning { background: rgba(255, 174, 0, 0.1); color: #ffae00; border: 1px solid #ffae00; box-shadow: 0 0 15px rgba(255,174,0,0.2) inset; }
+        .alert-danger { background: rgba(255, 0, 60, 0.1); color: #ff003c; border: 1px solid #ff003c; box-shadow: 0 0 15px rgba(255,0,60,0.2) inset; }
+
+        /* ----- TABLE ----- */
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .att-table { width: 100%; border-collapse: collapse; color: #fff; margin-top: 15px;}
+        .att-table th { text-align: left; padding: 15px; border-bottom: 2px solid #00f3ff; color: #00f3ff; text-shadow: 0 0 5px #00f3ff; background: rgba(0, 243, 255, 0.1); }
+        .att-table td { padding: 15px; border-bottom: 1px solid rgba(0, 243, 255, 0.3); }
+        .att-table tr:hover { background: rgba(0, 243, 255, 0.05); }
+        
+        .status-present { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px #00ff00; }
+        .status-far { color: #ff003c; font-weight: bold; text-shadow: 0 0 5px #ff003c; }
+
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">👩‍🏫 Teacher Portal</div>
+            <a href="/teacher/dashboard" class="nav-item active">Dashboard</a>
+            <a href="/teacher/student_list" class="nav-item">Student Attendance</a>
+            <a href="/teacher/profile" class="nav-item">Personal Info</a>
+            <a href="/teacher/settings" class="nav-item">Settings</a>
+        </div>
+        <a href="/logout" class="logout-btn">Secure Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Welcome, {{ teacher.name }}!</h1>
+                <p>SYSTEM PROTOCOL: GPS Geofencing active. Verification required within 3km of campus.</p>
+            </div>
+            <div class="uid-badge">
+                ID: {{ teacher.teacher_uid }}
+            </div>
+        </div>
+
+        {% if cycle_msg %}
+            <div class="alert {{ 'alert-danger' if cycle_error else 'alert-warning' }}">
+                ⚠️ {{ cycle_msg }}
+            </div>
+            <div style="margin-bottom: 30px; display: flex; gap: 15px;">
+                <a href="/start_new_month" class="btn-neon btn-danger" style="padding: 10px 20px;">🧹 Start New Month (Reset)</a>
+                {% if not cycle_error %}
+                    <a href="/export_student_attendance" class="btn-neon btn-warning" style="padding: 10px 20px;">📥 Export Student Data</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="cards-container">
+            <div class="card clickable-card" onclick="window.location.href='/teacher/student_list'">
+                <h3>Total Students</h3>
+                <div class="card-value">{{ total_students }} 🧑‍🎓</div>
+                <div style="font-size: 12px; color: #00f3ff; margin-top: 10px;">(Click to View List)</div>
+            </div>
+            
+            <div class="card">
+                <h3>Subject Assigned</h3>
+                <div class="card-value">{{ teacher.subject }}</div>
+            </div>
+            
+            <div class="card">
+                <h3>Lecture Time</h3>
+                <div class="card-value" style="color: #fbbf24; text-shadow: 0 0 10px #fbbf24;">{{ teacher.class_time }} - {{ teacher.end_time }}</div>
+            </div>
+        </div>
+
+        <div class="action-box">
+            <h2>Location Verification</h2>
+            <p>Click below to verify your GPS coordinates and mark your daily attendance securely.</p>
+            <button class="btn-neon" onclick="verifyLocation()">📍 Verify My Location</button>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">
+                <h2 style="margin:0; color: #fff; text-shadow: 0 0 10px #00f3ff; text-transform: uppercase; letter-spacing: 1px;">Your 30-Day Attendance History</h2>
+                <a href="/export_teacher_attendance" class="btn-neon" style="padding: 10px 20px; font-size: 14px;">📥 Export My History</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="att-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Location Coordinates</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in history %}
+                        <tr>
+                            <td>{{ entry.date }}</td>
+                            <td>{{ entry.time }}</td>
+                            <td class="{{ 'status-present' if entry.status == 'Present' else 'status-far' }}">
+                                {{ entry.status }}
+                            </td>
+                            <td style="color: rgba(0, 243, 255, 0.7);">{{ entry.location }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function verifyLocation() {
+            if (navigator.geolocation) {
+                // Neon-styled SweetAlert loading
+                Swal.fire({
+                    title: 'CHECKING SATELLITE GPS...',
+                    text: 'Please wait while we verify your location.',
+                    allowOutsideClick: false,
+                    background: 'rgba(0, 24, 40, 0.95)',
+                    color: '#00f3ff',
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    fetch('/verify_attendance_rules', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `lat=${lat}&lon=${lon}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ATTENDANCE MARKED!',
+                                text: `Verified! You are ${data.dist} km from campus.`,
+                                background: 'rgba(0, 24, 40, 0.95)',
+                                color: '#00ff00',
+                                confirmButtonColor: '#00ff00'
+                            }).then(() => { location.reload(); });
+                        } else if (data.status === 'premium' || data.status === 'warning') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'LOCATION ERROR!',
+                                html: `<b style="color:#ff003c; text-shadow: 0 0 5px #ff003c;">Access Denied!</b><br>You are ${data.dist} km away. Please mark attendance from within campus.`,
+                                background: 'rgba(0, 24, 40, 0.95)',
+                                color: '#fff',
+                                confirmButtonColor: '#ff003c'
+                            });
+                        }
+                    });
+                }, function() {
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'GPS ERROR', 
+                        text: 'Enable Location access to proceed.',
+                        background: 'rgba(0, 24, 40, 0.95)',
+                        color: '#ff003c',
+                        confirmButtonColor: '#ff003c'
+                    });
+                });
+            }
+        }
+    </script>
+</body>
+</html>

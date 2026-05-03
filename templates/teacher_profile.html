@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Profile | 3D Neon</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        
+        body { 
+            background-color: #050914; 
+            color: #e0f7fa; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+            perspective: 1200px; 
+        }
+
+        /* ----- 3D NEON GRID BACKGROUND ----- */
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px; 
+            transform: rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: moveGrid 15s linear infinite; 
+            z-index: 0;
+        }
+        @keyframes moveGrid { 0% { transform: rotateX(60deg) translateY(0) translateZ(-200px); } 100% { transform: rotateX(60deg) translateY(40px) translateZ(-200px); } }
+
+        /* ----- SIDEBAR (Glassmorphism Neon) ----- */
+        .sidebar { 
+            width: 260px; background: rgba(0, 15, 25, 0.8); height: 100vh; display: flex; flex-direction: column; 
+            border-right: 2px solid #00f3ff; box-shadow: 5px 0 20px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px); z-index: 10; padding: 20px 0;
+        }
+        .sidebar h3 { text-align: center; color: #00f3ff; margin-bottom: 30px; font-size: 18px; text-shadow: 0 0 10px #00f3ff; text-transform: uppercase; letter-spacing: 2px; }
+        .sidebar a { text-decoration: none; color: #a0d8ef; padding: 15px 25px; margin: 5px 15px; border-radius: 8px; font-weight: bold; transition: 0.3s; text-transform: uppercase; border: 1px solid transparent; font-size: 14px;}
+        .sidebar a:hover { background: rgba(0, 243, 255, 0.1); color: #fff; border-color: #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4) inset; transform: translateX(5px); }
+        .sidebar .active { background: rgba(0, 243, 255, 0.2); color: #00f3ff; border: 1px solid #00f3ff; box-shadow: 0 0 15px #00f3ff inset; }
+        .sidebar .logout { margin-top: auto; background: transparent; color: #ff003c; border: 1px solid #ff003c; text-align: center; box-shadow: 0 0 10px #ff003c inset; }
+        .sidebar .logout:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+        /* ----- MAIN CONTENT ----- */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; z-index: 10; }
+        .header-title { font-size: 24px; color: #fff; text-shadow: 0 0 10px #00f3ff; margin-bottom: 25px; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;}
+        
+        /* ----- 3D NEON CARDS ----- */
+        .neon-card { 
+            background: rgba(0, 24, 40, 0.6); padding: 30px; border-radius: 15px; 
+            border: 1px solid #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            max-width: 750px; margin-bottom: 40px; backdrop-filter: blur(8px); 
+            transform-style: preserve-3d; transition: transform 0.1s ease-out, box-shadow 0.3s ease; 
+        }
+
+        /* ----- PROFILE INFO ROWS ----- */
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed rgba(0, 243, 255, 0.3); transform: translateZ(20px); }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #00f3ff; font-weight: bold; font-size: 14px; text-transform: uppercase; width: 40%; text-shadow: 0 0 5px rgba(0,243,255,0.5); }
+        .info-value { font-size: 16px; font-weight: bold; width: 60%; text-align: right; color: #ffffff; }
+
+        /* ----- NEON INPUTS ----- */
+        .edit-input { background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.4); color: #00f3ff; padding: 10px; border-radius: 5px; width: 100%; outline: none; font-size: 15px; transition: 0.3s; font-family: inherit; }
+        .edit-input:focus { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.7) sepia(1) hue-rotate(180deg) saturate(3); cursor: pointer; }
+
+        .edit-mode { display: none; width: 60%; text-align: right; }
+        .time-group { display: flex; gap: 10px; }
+
+        /* ----- 3D NEON BUTTONS ----- */
+        .btn-container { margin-top: 25px; display: flex; gap: 15px; transform: translateZ(30px); }
+        .btn-neon { padding: 12px 25px; font-size: 14px; font-weight: bold; background: transparent; border-radius: 5px; cursor: pointer; transition: 0.4s; width: 100%; text-transform: uppercase; letter-spacing: 1px; font-family: inherit; }
+        
+        .edit-btn { color: #00f3ff; border: 2px solid #00f3ff; box-shadow: 0 0 10px #00f3ff inset; }
+        .edit-btn:hover { background: #00f3ff; color: #000; box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff inset; }
+        
+        .save-btn { color: #00ff00; border: 2px solid #00ff00; box-shadow: 0 0 10px #00ff00 inset; display: none; }
+        .save-btn:hover { background: #00ff00; color: #000; box-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00 inset; }
+        
+        .cancel-btn { color: #ff003c; border: 2px solid #ff003c; box-shadow: 0 0 10px #ff003c inset; display: none; }
+        .cancel-btn:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+        /* ----- REQUEST FORM ----- */
+        .request-form label { display: block; color: #ff003c; font-size: 13px; margin-bottom: 5px; margin-top: 15px; font-weight: bold; text-transform: uppercase; text-shadow: 0 0 5px rgba(255,0,60,0.5); }
+        .request-form input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 5px; border: 1px solid rgba(255, 0, 60, 0.4); background: rgba(255, 0, 60, 0.05); color: #fff; outline: none; font-family: inherit; }
+        .request-form input:focus { border-color: #ff003c; box-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
+        .del-req-btn { margin-top: 20px; color: #ff003c; border: 2px solid #ff003c; box-shadow: 0 0 10px #ff003c inset; }
+        .del-req-btn:hover { background: #ff003c; color: #000; box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c inset; }
+
+        /* ----- STATUS TABLE ----- */
+        .badge-pending { background: rgba(255, 174, 0, 0.1); color: #ffae00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #ffae00; box-shadow: 0 0 5px #ffae00 inset; }
+        .badge-success { background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #00ff00; box-shadow: 0 0 5px #00ff00 inset; }
+        .req-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 15px; }
+        .req-table th { background: rgba(0, 243, 255, 0.1); padding: 12px; font-size: 14px; color: #00f3ff; border-bottom: 2px solid #00f3ff; text-shadow: 0 0 5px #00f3ff;}
+        .req-table td { padding: 12px; border-bottom: 1px solid rgba(0, 243, 255, 0.2); font-size: 15px; color: white;}
+    </style>
+</head>
+<body>
+
+    <script>
+        if(localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); }
+    </script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    icon: '{{ messages[0][0] }}' === 'error' ? 'error' : 'success',
+                    title: '{{ messages[0][0] }}' === 'error' ? 'SYSTEM ERROR' : 'UPDATE SUCCESS',
+                    text: '{{ messages[0][1] }}',
+                    background: 'rgba(0, 24, 40, 0.95)',
+                    color: '#00f3ff',
+                    confirmButtonColor: '#00f3ff'
+                });
+            });
+        </script>
+      {% endif %}
+    {% endwith %}
+
+    <div class="bg-grid"></div>
+
+    <div class="sidebar">
+        <h3>👨‍🏫 Teacher Portal</h3>
+        <a href="/teacher/dashboard">Dashboard</a>
+        <a href="/teacher/student_list">Student Attendance</a>
+        <a href="/teacher/profile" class="active">Personal Info</a>
+        <a href="/teacher/settings">Settings</a> 
+        <a href="/logout" class="logout">Secure Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1 class="header-title">👤 Personal Information</h1>
+        
+        <div class="neon-card tilt-element">
+            <form id="profileForm" method="POST" action="/teacher/edit_profile">
+                
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value display-mode">{{ teacher.name }}</span>
+                    <div class="edit-mode"><input type="text" name="name" class="edit-input" value="{{ teacher.name }}" required></div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Username</span>
+                    <span class="info-value display-mode" style="color: #00f3ff; text-shadow: 0 0 5px #00f3ff;">@{{ teacher.username }}</span>
+                    <div class="edit-mode"><input type="text" name="username" class="edit-input" value="{{ teacher.username }}" required></div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Branch</span>
+                    <span class="info-value" style="color: #ffae00; text-shadow: 0 0 5px #ffae00;">{{ teacher.branch }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Email ID</span>
+                    <span class="info-value display-mode">{{ teacher.email }}</span>
+                    <div class="edit-mode"><input type="email" name="email" class="edit-input" value="{{ teacher.email }}" required></div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Mobile Number</span>
+                    <span class="info-value display-mode">+91 {{ teacher.mobile }}</span>
+                    <div class="edit-mode"><input type="text" name="mobile" class="edit-input" value="{{ teacher.mobile }}" required></div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Subject</span>
+                    <span class="info-value display-mode">{{ teacher.subject }}</span>
+                    <div class="edit-mode"><input type="text" name="subject" class="edit-input" value="{{ teacher.subject }}" required></div>
+                </div>
+
+                <div class="info-row" style="border-bottom: none;">
+                    <span class="info-label">Class Time</span>
+                    <span class="info-value display-mode" style="color: #00ff00; text-shadow: 0 0 5px #00ff00;">{{ teacher.class_time }} to {{ teacher.end_time }}</span>
+                    <div class="edit-mode time-group">
+                        <input type="time" name="class_time" class="edit-input" value="{{ teacher.class_time }}" required>
+                        <input type="time" name="end_time" class="edit-input" value="{{ teacher.end_time }}" required>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn-neon edit-btn" id="editBtn" onclick="enableEditing()">✏️ Edit Profile</button>
+                    <button type="submit" class="btn-neon save-btn" id="saveBtn">💾 Save Details</button>
+                    <button type="button" class="btn-neon cancel-btn" id="cancelBtn" onclick="cancelEditing()">❌ Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <h1 class="header-title" style="color: #ff003c; text-shadow: 0 0 10px #ff003c; border-color: rgba(255,0,60,0.3);">🗑️ Delete Student Request</h1>
+        <div class="neon-card tilt-element" style="border-color: #ff003c; box-shadow: 0 0 15px rgba(255,0,60,0.2), inset 0 0 15px rgba(255,0,60,0.1);">
+            <form class="request-form" action="/teacher/request_deletion" method="POST">
+                <label>Student Name</label>
+                <input type="text" name="student_name" placeholder="Ex: Amit" required>
+                
+                <label>Full Roll Number</label>
+                <input type="text" name="student_roll" placeholder="Ex: 987654" required>
+                
+                <label>Short ID (Generated ID)</label>
+                <input type="text" name="student_id" placeholder="Ex: 9654" required>
+                
+                <label>Reason for Deletion</label>
+                <input type="text" name="reason" placeholder="Ex: 10 Days Absent" required>
+                
+                <button type="submit" class="btn-neon del-req-btn">Submit Request to Principal</button>
+            </form>
+        </div>
+
+        {% if requests %}
+        <h1 class="header-title">📊 Request Status</h1>
+        <div class="neon-card tilt-element" style="padding: 0; overflow: hidden;">
+            <table class="req-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in requests %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ r.student_name }}</td>
+                        <td style="color: rgba(255,255,255,0.7);">{{ r.reason }}</td>
+                        <td>
+                            {% if r.status == 'Pending' %}
+                                <span class="badge-pending">⏳ Pending</span>
+                            {% else %}
+                                <span class="badge-success">✅ Successful</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="padding: 15px; font-size: 12px; color: rgba(0,243,255,0.5); text-align: center;">Note: Successful requests auto-hide after 2 hours.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <script>
+        // Profile Edit Toggle Logic
+        function enableEditing() {
+            document.querySelectorAll('.display-mode').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'block');
+            document.getElementById('editBtn').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'block';
+            document.getElementById('cancelBtn').style.display = 'block';
+        }
+
+        function cancelEditing() {
+            document.querySelectorAll('.display-mode').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
+            document.getElementById('editBtn').style.display = 'block';
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        // 3D Tilt Effect for Cards
+        document.querySelectorAll('.tilt-element').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                let rect = card.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                let xAxis = (rect.width / 2 - x) / 30;
+                let yAxis = (rect.height / 2 - y) / 30;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+                card.style.transition = `transform 0.5s ease`;
+            });
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = `none`;
+            });
+        });
+    </script>
+
+</body>
+</html>

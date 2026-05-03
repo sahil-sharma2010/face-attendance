@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Student</title>
+    <style>
+        body {
+            background-color: #11141c;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .box {
+            background-color: #1e2532;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #2d3342;
+            width: 320px;
+        }
+        h1 { color: #0097ff; margin-bottom: 20px; font-size: 22px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background-color: #11141c;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+            border: 1px solid #2d3342;
+        }
+        input:focus { border: 1px solid #0097ff; }
+        .btn-start {
+            width: 100%;
+            padding: 12px;
+            background-color: #0097ff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+        .btn-start:hover { background-color: #007bb5; }
+        .btn-back {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff4757;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        .btn-back:hover { background-color: #ff3344; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Add New Student 👤</h1>
+        
+        <form method="GET" action="/capture_images">
+            <input type="text" name="name" placeholder="Enter Name" required>
+            <input type="text" name="roll" placeholder="Enter Roll No" required>
+            <button type="submit" class="btn-start">Save & Start Camera</button>
+        </form>
+
+        <a href="/dashboard" style="text-decoration: none;">
+            <button class="btn-back">Back to Dashboard</button>
+        </a>
+    </div>
+</body>
+</html>

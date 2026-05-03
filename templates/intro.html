@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Check...</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background-color: #000; overflow: hidden; font-family: 'Courier New', Courier, monospace;
+        }
+        
+        /* Full Screen Background Video */
+        .video-bg { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: -1; object-fit: cover; opacity: 0.7;
+        }
+
+        /* Loading Text Animation */
+        .loading-container {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; color: #00f3ff; text-shadow: 0 0 15px #00f3ff; width: 100%;
+        }
+        .loading-text { font-size: 32px; font-weight: bold; letter-spacing: 5px; margin-bottom: 10px; text-transform: uppercase; }
+        .sub-text { font-size: 16px; opacity: 0.9; letter-spacing: 2px; }
+        
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 350px; height: 8px; background: rgba(0, 243, 255, 0.2); 
+            border-radius: 10px; margin: 25px auto; overflow: hidden; border: 1px solid #00f3ff;
+        }
+        .progress-bar {
+            height: 100%; width: 0%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff;
+            animation: load 7s linear forwards; /* 🔥 EXACT 7 SECONDS TIMER */
+        }
+
+        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline class="video-bg" id="bgVideo">
+        <source src="{{ url_for('static', filename='intro.mp4') }}?v=1" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <div class="loading-container">
+        <div class="loading-text">ENCRYPTING SESSION...</div>
+        <div class="sub-text">ESTABLISHING SECURE GATEWAY TO DASHBOARD</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        // 1. BACK BUTTON KO LOCK KARNA (User piche nahi ja payega = MAXIMUM SECURITY)
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        // 2. EXACT 7 SECOND BAAD DASHBOARD PAR BHEJNA
+        setTimeout(function() {
+            window.location.replace("{{ next_url }}"); 
+        }, 7000); 
+    </script>
+</body>
+</html>

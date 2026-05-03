@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verifying...</title>
+
+    <!-- 🔥 Prevent Back Cache -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <style>
+        body {
+            background: black;
+            color: #00ff00;
+            font-family: monospace;
+            text-align: center;
+            padding-top: 70px;
+        }
+
+        .terminal {
+            width: 60%;
+            margin: auto;
+            text-align: left;
+        }
+
+        .line {
+            margin: 5px 0;
+        }
+
+        .progress {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+
+    <script>
+        let lines = [
+            "Checking Register Details & Matching Database...",
+            "Checking Phone Number...",
+            "Checking Email ID...",
+            "Scanning Device...",
+            "Encrypting Session...",
+            "Applying Security Layers..."
+        ];
+
+        let index = 0;
+        let percent = 0;
+
+        function typeLine() {
+            if (index < lines.length) {
+                let container = document.getElementById("output");
+                let newLine = document.createElement("div");
+                newLine.className = "line";
+                newLine.innerHTML = "> " + lines[index];
+                container.appendChild(newLine);
+
+                index++;
+                setTimeout(typeLine, 500);
+            }
+        }
+
+        function updateProgress() {
+            let bar = document.getElementById("bar");
+
+            percent += 5;
+            bar.innerHTML = "[" + "█".repeat(percent/5) + "░".repeat(20 - percent/5) + "] " + percent + "%";
+
+            if (percent < 100) {
+                setTimeout(updateProgress, 200);
+            } else {
+                document.getElementById("status").innerHTML = "✔ ACCESS GRANTED...";
+
+                // 🔥 IMPORTANT FIX (NO BACK ISSUE)
+                setTimeout(function(){
+                    window.location.replace("{{ next_url }}");
+                }, 1200);
+            }
+        }
+
+        window.onload = function() {
+            typeLine();
+            updateProgress();
+        };
+
+        // 🔥 EXTRA: Prevent back button showing this page
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.location.replace("/");
+        };
+    </script>
+</head>
+
+<body>
+
+<h2>DATA PRIVACY AUTHORIZED</h2>
+<h3>BY SAHIL</h3>
+
+<div class="terminal" id="output"></div>
+
+<div class="progress" id="bar">[░░░░░░░░░░░░░░░░░░░░] 0%</div>
+<p id="status">Initializing Secure Channel...</p>
+
+</body>
+</html>
